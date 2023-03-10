@@ -6,24 +6,21 @@ import yaml
 import cv2.aruco as aruco
 import math
 
-default_config_dir = "/home/xy/pyproj/robosuite/dect/detector.yaml"
+default_config_dir = "camera_params.npz"
 
 
 class RemoteDetector(object):
 
-    def __init__(self, config_path=default_config_dir, marker_len=None, camera_id=None):
+    def __init__(self, config_path=default_config_dir, marker_len=0.015, camera_id=0):
         self.config_path = config_path
-        self._camera_id = self._readConfig('camera_id')
+        self._camera_id = camera_id
         if camera_id is not None: self._camera_id = camera_id
         self.camera = cv2.VideoCapture(self._camera_id)
-        self._camera_width = self._readConfig("camera_width")
-        self._camera_height = self._readConfig("camera_height")
-        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, self._camera_width)
-        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self._camera_height)
-        self._marker_len = self._readConfig("marker_length")  # Length of marker in meters
-        if marker_len is not None: self._marker_len = marker_len
-        self._camera_matrix = np.array(self._readConfig("camera_matrix"))  # 3x3 camera intrinsic matrix
-        self._camera_dist = np.array(self._readConfig("camera_dist"))  # vector of distortion coefficients
+        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self._marker_len = marker_len
+        self._camera_matrix = np.array(self._readConfig("mtx"))  # 3x3 camera intrinsic matrix
+        self._camera_dist = np.array(self._readConfig("dist"))  # vector of distortion coefficients
 
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
         self.parameters = cv2.aruco.DetectorParameters()
@@ -43,7 +40,7 @@ class RemoteDetector(object):
         '''Read a specific parameter from config file'''
         # TODO
         with open(self.config_path, 'r') as config:
-            data = yaml.safe_load(config)
+            data = np.loasd(config)
             return data[keyword]
 
     def _action_modifier(self, action, t_coef, r_coef):
@@ -160,3 +157,17 @@ class RemoteDetector(object):
         action = action.dot((np.append(self.reflec_mat, self.reflec_mat)))
 
         return action
+
+      def single_marker_control(self, tag_id):
+    '''return the variation of the target marker's pose'''
+    self._detect_marker()
+    action = np.zeros(7)
+    for key in self.pose_data:
+        if key == tag_id:
+            if not self._ori_estimator(self.pose_data[key]):
+                action[0:6] = self.last_pose - self.pose_data[key]
+                self.last_pose = self.pose_data[key]
+
+    action = self._action_modifier(action, 200, 2)
+
+    return action
