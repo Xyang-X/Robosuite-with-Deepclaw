@@ -1,6 +1,6 @@
 # Tutorial of Robosuite
 
-Robosuite is a simulation framework powered by the MuJoCo physics engine for robot learning. You can click [here][id]:https://robosuite.ai/
+Robosuite is a simulation framework powered by the MuJoCo physics engine for robot learning. You can click [here](https://robosuite.ai/) for more information. In this section we will start from installation of robosuite. After that, you will learn how to load and control a robot in  robosuite.
 ## Installation
 
 ### Install with `pip`
