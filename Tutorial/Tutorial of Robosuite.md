@@ -105,6 +105,7 @@ env = suite.make(
         has_renderer=True, 
         has_offscreen_renderer=False,
         use_camera_obs=False,
+	control_freq=20, # set control frequency as 20Hz
         render_camera="frontview", # try with other views like "sideview" and "birdview
     )
 env.reset()
@@ -130,6 +131,7 @@ env = suite.make(
     has_offscreen_renderer=False,
     use_camera_obs=False,
     render_camera="sideview",
+    control_freq=20, # set control frequency as 20Hz
     controller_configs=controllerconfig # load the preset controller into environment
 )
 ```
