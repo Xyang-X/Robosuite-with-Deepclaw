@@ -42,7 +42,32 @@ class RemoteDetector(object):
         with open(self.config_path, 'r') as config:
             data = np.loasd(config)
             return data[keyword]
+    def _ori_estimator(self, pose):
+        '''judge if the orientation of z-axis of marker is correct'''
+        rot = self._rotation_mat(pose[3:6])
+        jerk = False
 
+        for i, r in enumerate(pose[3:6]):
+            if abs(r - self.last_pose[i + 3]) > np.pi / 2 and self._detc_confirm == True:
+                jerk = True
+                # print(jerk)
+
+        if rot[2, 2] > 0:
+            jerk = True
+
+        return jerk
+
+    def _rotation_mat(self, rvec):
+        '''output the rotation matrix from the rotation angle of a marker'''
+        rz = rvec[2]
+        ry = rvec[1]
+        rx = rvec[0]
+        rot_z = np.array([[np.cos(rz), np.sin(rz), 0], [-np.sin(rz), np.cos(rz), 0], [0, 0, 1]])
+        rot_y = np.array([[np.cos(ry), 0, -np.sin(ry)], [0, 1, 0], [np.sin(ry), 0, np.cos(ry)]])
+        rot_x = np.array([[1, 0, 0], [0, np.cos(rx), np.sin(rx)], [0, -np.sin(rx), np.cos(rx)]])
+        rot_mat = rot_x.dot(rot_y)
+        rot_mat = rot_mat.dot(rot_z)
+        return rot_mat
     def _action_modifier(self, action, t_coef, r_coef):
         '''filter the noise of action order and amplify the input action'''
         for i in range(3, 6):
