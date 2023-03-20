@@ -86,7 +86,7 @@ env.render()
 
 If succeed, you would see:
 
-![Aaron Swartz](https://github.com/Xyang-X/Robosuite-with-Deepclaw/blob/main/img/robot_demo.png?raw=true)
+![Aaron Swartz](https://github.com/Xyang-X/Robosuite-with-Deepclaw/blob/main/Tutorial/img/robot_demo.png?raw=true)
 
  	 
 
