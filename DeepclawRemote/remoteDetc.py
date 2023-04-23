@@ -174,7 +174,7 @@ class RemoteDetector(object):
                 # self.last_ori[1] = self.pose_data[5][3:6]
             if self._detc_confirm:
                 action[0:6] = self.last_pose - current_pose
-                action = self._action_modifier(action, 200, 4)
+                action = self._action_modifier(action, 1, 2)
             else:
                 if not z_jerk:
                     self._detc_confirm = True
@@ -193,6 +193,6 @@ class RemoteDetector(object):
                 action[0:6] = self.last_pose - self.pose_data[key]
                 self.last_pose = self.pose_data[key]
 
-    action = self._action_modifier(action, 200, 2)
+    action = self._action_modifier(action, 1, 1)
 
     return action
